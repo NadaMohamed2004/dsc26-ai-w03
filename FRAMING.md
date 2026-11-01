@@ -1,0 +1,7 @@
+# AI usage
+
+**Tools and what for:** I used Claude (Anthropic) to explain the task and the slides, to draft `tawseel/model.py` (history features, time split, pipeline, evaluation), to produce the RESULTS.md table layout, and to help me run everything in Google Colab. I ran the code and the tests myself in Colab (Python 3.13 there, with the pinned numpy, pandas and scikit-learn versions).
+
+**AI-suggested code rejected or fixed:** In `add_history_features` and `time_split` I did not change the AI's code: it passed the 5 public tests and gave the expected results on the seeds I checked (0, 1, 2, 3), so I had no failing test to point to. I did rewrite the pipeline helpers by hand to make them easier for me to read and explain: `extract_time_features`, `convert_to_text`, `convert_to_object`, `convert_to_numeric`, and the body of `build_pipeline`. After the rewrite the numbers were identical (PR-AUC lift +0.132 on seed 0), so the behaviour did not change. One real problem I hit: after copying the new file in Colab I got `NotImplementedError` because the notebook kernel still had the old module loaded; restarting the session fixed it.
+
+**No-leak check:** `FEATURE_COLUMNS` excludes `courier_notes`, `delivered_at`, `failed` and `parcel_id`; the split is by time (last 20% is test); history features count only strictly earlier parcels; the test ROC AUC is 0.635, far below the 0.9 that signals a leak.
